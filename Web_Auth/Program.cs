@@ -7,6 +7,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Web_Auth.Authentication;
+using Web_Auth.Data.Contexts;
+using WebAuth.Mappings;
+using WebAuth.Repositories;
+using WebDBFirst.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +18,12 @@ var builder = WebApplication.CreateBuilder(args);
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    builder.Services.AddDbContext<SecondDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SecondDatabase")));
+
+   
+
     // For Identity
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
           .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -42,6 +52,11 @@ var builder = WebApplication.CreateBuilder(args);
             (Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
         };
     });
+
+    builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+    builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+    builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 
     builder.Services.AddControllers();
